@@ -12,3 +12,6 @@ peerDependencyRules:
   allowedVersions:
     vite: "*"
     vitest: "*"
+packages:
+  - .
+  - playground
