@@ -48,14 +48,14 @@ Conditional attachment:
 
 Triggers `onTrigger` (or `node.click()`) when a matching key is pressed. Sets `aria-keyshortcuts` on the element and restores the prior value on cleanup.
 
-| Parameter | Type | Default |
-|---|---|---|
-| `keys` | `string \| string[]` | required |
-| `onTrigger` | `(e: KeyboardEvent, node: HTMLElement) => void` | `node.click()` |
-| `options.preventDefault` | `boolean` | `true` |
-| `options.stopPropagation` | `boolean` | `false` |
-| `options.ignoreInputs` | `boolean` | `true` |
-| `options.ignoreRepeat` | `boolean` | `true` |
+| Parameter                 | Type                                            | Default        |
+| ------------------------- | ----------------------------------------------- | -------------- |
+| `keys`                    | `string \| string[]`                            | required       |
+| `onTrigger`               | `(e: KeyboardEvent, node: HTMLElement) => void` | `node.click()` |
+| `options.preventDefault`  | `boolean`                                       | `true`         |
+| `options.stopPropagation` | `boolean`                                       | `false`        |
+| `options.ignoreInputs`    | `boolean`                                       | `true`         |
+| `options.ignoreRepeat`    | `boolean`                                       | `true`         |
 
 Shortcut strings: `k`, `ctrl+s`, `shift+space`, `mod+/`. `mod` resolves to `⌘` on Mac and `Ctrl` elsewhere.
 
@@ -63,18 +63,18 @@ Shortcut strings: `k`, `ctrl+s`, `shift+space`, `mod+/`. `mod` resolves to `⌘`
 
 Adds `className` while a matching key is held, removes it on keyup. If `keys` is omitted, reads from `aria-keyshortcuts` (set by `hotkey`).
 
-| Parameter | Type | Default |
-|---|---|---|
-| `keys` | `string \| string[]` | reads `aria-keyshortcuts` |
-| `className` | `string` | `"is-pressed"` |
+| Parameter   | Type                 | Default                   |
+| ----------- | -------------------- | ------------------------- |
+| `keys`      | `string \| string[]` | reads `aria-keyshortcuts` |
+| `className` | `string`             | `"is-pressed"`            |
 
 ### `formatHint(keys)`
 
 Formats a shortcut for display. `mod+s` → `⌘ S` on Mac, `Ctrl + S` on PC.
 
 ```ts
-formatHint("mod+s")          // "⌘ S" / "Ctrl + S"
-formatHint(["j", "down"])    // "J / Down"
+formatHint("mod+s"); // "⌘ S" / "Ctrl + S"
+formatHint(["j", "down"]); // "J / Down"
 ```
 
 ### `addTransform(fn)`
