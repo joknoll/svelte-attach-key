@@ -48,10 +48,20 @@ export default defineConfig({
     "*": "vp check --fix",
   },
   pack: {
+    entry: ["src/index.ts"],
+    format: ["esm"],
     dts: {
       tsgo: true,
     },
     exports: true,
+    platform: "neutral",
+    target: false,
+    minify: true,
+    deps: {
+      neverBundle: ["svelte", /^svelte\//],
+      skipNodeModulesBundle: true,
+    },
+    report: { brotli: true },
   },
   lint: {
     options: {

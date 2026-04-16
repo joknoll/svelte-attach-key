@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { hotkey } from "svelte-attach-key";
+  import { formatHint, hotkey, pressed } from "svelte-attach-key";
 
   let saveCount = $state(0);
   let undoCount = $state(0);
   let likeCount = $state(0);
-  let searchCount = $state(0);
   let enabled = $state(true);
   let lastKey = $state<string | null>(null);
 
@@ -24,13 +23,18 @@
       <h2>Simple key</h2>
       <p>Press <kbd>L</kbd> anywhere to like</p>
       <button
+        title={formatHint("l")}
         {@attach hotkey("l")}
-        onclick={() => { likeCount++; flash("L"); }}
+        {@attach pressed()}
+        onclick={() => {
+          likeCount++;
+          flash("L");
+        }}
         class:flash={lastKey === "L"}
       >
         ♥ Like ({likeCount})
       </button>
-      <code>hotkey('l')</code>
+      <code>hotkey("l")</code>
     </div>
 
     <!-- Modifier keys -->
@@ -38,13 +42,17 @@
       <h2>Modifier keys</h2>
       <p>Press <kbd>Ctrl</kbd>+<kbd>S</kbd> to save</p>
       <button
-        {@attach hotkey("s", { ctrl: true })}
-        onclick={() => { saveCount++; flash("Ctrl+S"); }}
+        title={formatHint("ctrl+s")}
+        {@attach hotkey("ctrl+s")}
+        onclick={() => {
+          saveCount++;
+          flash("Ctrl+S");
+        }}
         class:flash={lastKey === "Ctrl+S"}
       >
         Save ({saveCount})
       </button>
-      <code>hotkey('s', &#123; ctrl: true &#125;)</code>
+      <code>hotkey("ctrl+s")</code>
     </div>
 
     <!-- Cross-platform mod -->
@@ -52,28 +60,32 @@
       <h2>Cross-platform mod</h2>
       <p>Press <kbd>Mod</kbd>+<kbd>Z</kbd> (Ctrl on Windows/Linux, ⌘ on Mac)</p>
       <button
-        {@attach hotkey("z", { mod: true })}
-        onclick={() => { undoCount++; flash("Mod+Z"); }}
+        title={formatHint("mod+z")}
+        {@attach hotkey("mod+z")}
+        onclick={() => {
+          undoCount++;
+          flash("Mod+Z");
+        }}
         class:flash={lastKey === "Mod+Z"}
       >
         Undo ({undoCount})
       </button>
-      <code>hotkey('z', &#123; mod: true &#125;)</code>
+      <code>hotkey("mod+z")</code>
     </div>
 
-    <!-- Element-scoped -->
+    <!-- Direct option -->
     <div class="card">
-      <h2>Element-scoped</h2>
-      <p><kbd>Tab</kbd> to focus the button, then press <kbd>G</kbd></p>
-      <p class="hint">Pressing <kbd>G</kbd> without focus does nothing</p>
+      <h2>Direct option</h2>
+      <p>Shortcut passed in the attachment options instead of markup</p>
       <button
-        {@attach hotkey("g", { global: false })}
-        onclick={() => { searchCount++; flash("G"); }}
-        class:flash={lastKey === "G"}
+        title={formatHint("shift+space")}
+        {@attach hotkey("shift+space")}
+        onclick={() => flash("Shift+Space")}
+        class:flash={lastKey === "Shift+Space"}
       >
-        Focused trigger ({searchCount})
+        Shift+Space
       </button>
-      <code>hotkey('g', &#123; global: false &#125;)</code>
+      <code>hotkey("shift+space")</code>
     </div>
 
     <!-- Toggle enabled -->
@@ -81,8 +93,8 @@
       <h2>Conditional</h2>
       <p>Press <kbd>K</kbd> — toggle to enable/disable</p>
       <label class="toggle">
-        <input type="checkbox" bind:checked={enabled} />
-        Hotkey {enabled ? "enabled" : "disabled"}
+        <input type="checkbox" bind:checked={enabled} {@attach hotkey("h")} />
+        Hotkey {enabled ? "enabled" : "disabled"} <kbd>H</kbd>
       </label>
       <button
         {@attach enabled && hotkey("k")}
@@ -92,21 +104,22 @@
       >
         Press K
       </button>
-      <code>&#123;@attach enabled && hotkey('k')&#125;</code>
+      <code>&#123;@attach enabled && hotkey("k")&#125;</code>
     </div>
 
-    <!-- Physical key code -->
+    <!-- Alternatives -->
     <div class="card">
-      <h2>Physical key (code)</h2>
-      <p>Press <kbd>W</kbd> regardless of keyboard layout</p>
+      <h2>Alternatives</h2>
+      <p>Either <kbd>J</kbd> or <kbd>↓</kbd> will trigger the button</p>
       <button
-        {@attach hotkey("KeyW", { code: true })}
-        onclick={() => flash("KeyW")}
-        class:flash={lastKey === "KeyW"}
+        title={formatHint(["j", "arrowdown"])}
+        {@attach hotkey(["j", "arrowdown"])}
+        onclick={() => flash("J or ArrowDown")}
+        class:flash={lastKey === "J or ArrowDown"}
       >
-        Move Up
+        Move down
       </button>
-      <code>hotkey('KeyW', &#123; code: true &#125;)</code>
+      <code>hotkey(["j", "arrowdown"])</code>
     </div>
   </div>
 

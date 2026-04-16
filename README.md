@@ -1,56 +1,98 @@
 # svelte-attach-key
 
-A Svelte attachment for binding keyboard shortcuts to DOM elements using the [Svelte 5 attachments API](https://svelte.dev/docs/svelte/attachments).
+Svelte 5 attachments for wiring keyboard shortcuts to DOM elements.
 
-## Example
+## Usage
 
 ```svelte
 <script lang="ts">
-  import { hotkey } from "svelte-attach-key";
+  import { hotkey, pressed, formatHint } from "svelte-attach-key";
 </script>
 
-<!-- Global hotkey -->
-<button {@attach hotkey("l")} onclick={() => console.log("liked")}>
-  Like
-</button>
-
-<!-- With modifiers -->
-<button {@attach hotkey("s", { ctrl: true })} onclick={() => console.log("saved")}>
-  Save
-</button>
-
-<!-- Cross-platform: Ctrl on Windows/Linux, Cmd on Mac -->
-<button {@attach hotkey("z", { mod: true })} onclick={() => console.log("undo")}>
-  Undo
-</button>
-
-<!-- Only works while the element is focused -->
-<button {@attach hotkey("g", { global: false })} onclick={() => console.log("focused action")}>
-  Focused trigger
-</button>
-
-<!-- Match the physical key instead of the typed character -->
-<button {@attach hotkey("KeyW", { code: true })} onclick={() => console.log("move up")}>
-  Move Up
-</button>
-
-<!-- Conditional attachment -->
-<button {@attach enabled && hotkey("k")} onclick={() => console.log("pressed k")}>
-  Press K
+<button
+  {@attach hotkey("mod+k")}
+  onclick={() => console.log("opened")}
+>
+  Open command menu
 </button>
 ```
 
-## Guide
+`hotkey("mod+k")` sets `aria-keyshortcuts="mod+k"` on the element automatically. `pressed()` reads it back to know which key to watch.
 
-Use `hotkey(key, options)` on any clickable element.
+Pass alternative shortcuts as an array — either key triggers the element:
 
-- `hotkey("l")`: trigger the element with a simple key.
-- `hotkey("s", { ctrl: true })`: require modifier keys like `ctrl`, `shift`, `alt`, or `meta`.
-- `hotkey("z", { mod: true })`: use `Ctrl` on Windows/Linux and `Cmd` on Mac.
-- `hotkey("g", { global: false })`: listen only while the element itself is focused.
-- `hotkey("KeyW", { code: true })`: match a physical keyboard key via `KeyboardEvent.code`.
-- `enabled && hotkey("k")`: attach conditionally.
+```svelte
+<button
+  title={formatHint(["j", "arrowdown"])}
+  {@attach hotkey(["j", "arrowdown"])}
+>
+  Move down
+</button>
+```
 
-By default, the hotkey is global, ignores inputs/textareas/selects, and triggers the element's `click()`.
+Attach a callback instead of relying on `click`:
 
-[Demo](https://joknoll.github.io/svelte-attach-key/) | [npm](https://npmx.dev/package/svelte-attach-key)
+```svelte
+<button {@attach hotkey("mod+s", (e) => save())}>Save</button>
+```
+
+Conditional attachment:
+
+```svelte
+<button {@attach enabled && hotkey("k")}>Press K</button>
+```
+
+## API
+
+### `hotkey(keys, onTrigger?, options?)`
+
+Triggers `onTrigger` (or `node.click()`) when a matching key is pressed. Sets `aria-keyshortcuts` on the element and restores the prior value on cleanup.
+
+| Parameter | Type | Default |
+|---|---|---|
+| `keys` | `string \| string[]` | required |
+| `onTrigger` | `(e: KeyboardEvent, node: HTMLElement) => void` | `node.click()` |
+| `options.preventDefault` | `boolean` | `true` |
+| `options.stopPropagation` | `boolean` | `false` |
+| `options.ignoreInputs` | `boolean` | `true` |
+| `options.ignoreRepeat` | `boolean` | `true` |
+
+Shortcut strings: `k`, `ctrl+s`, `shift+space`, `mod+/`. `mod` resolves to `⌘` on Mac and `Ctrl` elsewhere.
+
+### `pressed(keys?, className?)`
+
+Adds `className` while a matching key is held, removes it on keyup. If `keys` is omitted, reads from `aria-keyshortcuts` (set by `hotkey`).
+
+| Parameter | Type | Default |
+|---|---|---|
+| `keys` | `string \| string[]` | reads `aria-keyshortcuts` |
+| `className` | `string` | `"is-pressed"` |
+
+### `formatHint(keys)`
+
+Formats a shortcut for display. `mod+s` → `⌘ S` on Mac, `Ctrl + S` on PC.
+
+```ts
+formatHint("mod+s")          // "⌘ S" / "Ctrl + S"
+formatHint(["j", "down"])    // "J / Down"
+```
+
+### `addTransform(fn)`
+
+Registers a transform applied before parsing and formatting. Returns a remover function.
+
+```ts
+const remove = addTransform((s) => s.replaceAll("primary", "mod"));
+```
+
+### `likelyWithKeyboard()`
+
+Returns `true` when the primary pointer is not coarse (i.e. likely has a keyboard). Use to conditionally render shortcut hints.
+
+## Notes
+
+- Shortcuts are global by default (fire regardless of which element has focus).
+- Inputs, textareas, selects, and `contenteditable` are ignored by default.
+- Add `data-keyshortcuts-ignore` to a container to suppress shortcuts while focus is inside that subtree.
+
+[Demo](https://joknoll.github.io/svelte-attach-key/) | [npm](https://npmjs.com/package/svelte-attach-key)
