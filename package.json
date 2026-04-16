@@ -1,6 +1,6 @@
 {
   "name": "svelte-attach-key",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A Svelte attachment for binding keys to DOM elements",
   "keywords": [
     "attachment",
