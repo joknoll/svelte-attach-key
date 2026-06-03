@@ -1,4 +1,5 @@
-export { hotkey, pressed } from "./attachments.ts";
-export type { HotkeyOptions, HotkeyTrigger } from "./attachments.ts";
-export { formatHint, likelyWithKeyboard } from "./hint.ts";
-export { addTransform } from "./dispatcher.ts";
+import { GamepadButtonMap, type ButtonName } from './buttons.ts';
+
+export function clickOnGamepad(buttonName: ButtonName, padIndex: number = 0) {
+  const pad = navigator.getGamepads()[padIndex];
+}
